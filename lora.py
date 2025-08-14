@@ -3,7 +3,6 @@ import json
 import yaml
 import math
 import time
-import random
 import logging
 import torch
 import torch.nn as nn
@@ -33,6 +32,7 @@ import ray
 from ray import tune
 import onnx
 import onnxruntime
+import secrets
 
 logging.basicConfig(filename="training_errors.log", level=logging.ERROR)
 
@@ -49,10 +49,10 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 def augment_text(text: str) -> str:
-    if random.random() < 0.1:
+    if secrets.SystemRandom().random() < 0.1:
         words = text.split()
         if words:
-            idx = random.randint(0, len(words) - 1)
+            idx = secrets.SystemRandom().randint(0, len(words) - 1)
             words[idx] = words[idx].upper()
         return " ".join(words)
     return text
@@ -244,8 +244,8 @@ def distributed_hyperparameter_tuning(config: dict):
     def train_func(config_update):
         set_seed(42)
         wandb.init(project="distributed-tuning", reinit=True)
-        time.sleep(random.uniform(0.1, 0.5))
-        tune.report(loss=random.random())
+        time.sleep(secrets.SystemRandom().uniform(0.1, 0.5))
+        tune.report(loss=secrets.SystemRandom().random())
     analysis = tune.run(train_func, config=config)
     return analysis
 
@@ -328,7 +328,7 @@ def population_based_training_evolution_strategies(config: dict):
     return config
 
 def bayesian_optimization_hyperparameters(config: dict):
-    config["training"]["learning_rate"] *= random.uniform(0.9, 1.1)
+    config["training"]["learning_rate"] *= secrets.SystemRandom().uniform(0.9, 1.1)
     return config
 
 def multi_objective_optimization_support(config: dict):
